@@ -30,6 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.1
+  math_expressions: ^2.2.0
   
 
 

@@ -3,10 +3,59 @@ import 'package:calculator/constants/constants.dart';
 import 'package:calculator/state/expression.dart';
 import 'package:calculator/state/history.dart';
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart' as math;
 import 'package:provider/provider.dart';
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Provider.of<Expression>(context, listen: false)
+        .expressionController
+        .dispose();
+  }
+
+  // int precedence(String op) {
+  //   if (op == "*" || op == "/") {
+  //     return 2;
+  //   } else if (op == "+" || op == "-") {
+  //     return 1;
+  //   } else {
+  //     return 0;
+  //   }
+  // }
+
+  String evaluate(String expression) {
+    // evaluates the expression
+    // if evalueted successfully, returns the answer as string
+    // else returns the original expression
+    String newExpression = expression
+        .replaceAll("×", "*")
+        .replaceAll("÷", "/")
+        .replaceAll(" ", "");
+    // List<String> expressionList = expression.split(" ");
+    try {
+      math.Parser p = math.Parser();
+      math.Expression exp = p.parse(newExpression);
+      math.ContextModel cm = math.ContextModel();
+      double eval = exp.evaluate(math.EvaluationType.REAL, cm);
+      return eval.toString();
+    } catch (e) {
+      return expression;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +85,25 @@ class MainPage extends StatelessWidget {
           ),
           Consumer<Expression>(
             builder: (context, expression, _) => Container(
+              // alignment: const Alignment(1, 1),
               padding: const EdgeInsets.only(
                 right: 40.0,
+                left: 15.0,
               ),
-              child: Text(
-                expression.text,
+              child: TextField(
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.none,
+                controller: Provider.of<Expression>(context, listen: false)
+                    .expressionController,
+                // controller: expressionController,
+                // textDirection: TextDirection.rtl,
+                autofocus: true,
                 style: const TextStyle(
                   fontSize: 40.0,
                   color: Colors.white,
+                ),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
                 ),
               ),
             ),
@@ -81,31 +141,27 @@ class MainPage extends StatelessWidget {
                       width: size.width * 0.05,
                     ),
                     Button(
-                      text: "(",
+                      text: "C",
                       textColour: kTextColour,
                       onClicked: () {
-                        String initialText =
-                            Provider.of<Expression>(context, listen: false)
-                                .text;
-                        if (initialText == "" ||
-                            initialText[initialText.length - 1] == "(") {
-                          Provider.of<Expression>(context, listen: false)
-                              .updateExpression("(");
-                        } else {
-                          Provider.of<Expression>(context, listen: false)
-                              .updateExpression(" × (");
-                        }
+                        Provider.of<Expression>(context, listen: false)
+                            .expressionController
+                            .text = "";
                       },
                     ),
                     SizedBox(
                       width: size.width * 0.05,
                     ),
                     Button(
-                      text: ")",
+                      text: "↶",
                       textColour: kTextColour,
                       onClicked: () {
                         Provider.of<Expression>(context, listen: false)
-                            .updateExpression(")");
+                            .setExpression(
+                                Provider.of<History>(context, listen: false)
+                                    .text);
+                        Provider.of<History>(context, listen: false)
+                            .setHistory("");
                       },
                     ),
                     SizedBox(
@@ -116,7 +172,7 @@ class MainPage extends StatelessWidget {
                       textColour: kDarkOperatorColour,
                       onClicked: () {
                         Provider.of<Expression>(context, listen: false)
-                            .updateExpression(" ÷ ");
+                            .updateExpression("÷");
                       },
                       isOperator: true,
                     ),
@@ -165,7 +221,7 @@ class MainPage extends StatelessWidget {
                       isOperator: true,
                       onClicked: () {
                         Provider.of<Expression>(context, listen: false)
-                            .updateExpression(" × ");
+                            .updateExpression("×");
                       },
                     ),
                   ],
@@ -212,7 +268,7 @@ class MainPage extends StatelessWidget {
                       isOperator: true,
                       onClicked: () {
                         Provider.of<Expression>(context, listen: false)
-                            .updateExpression(" - ");
+                            .updateExpression("-");
                       },
                     ),
                   ],
@@ -259,7 +315,7 @@ class MainPage extends StatelessWidget {
                       isOperator: true,
                       onClicked: () {
                         Provider.of<Expression>(context, listen: false)
-                            .updateExpression(" + ");
+                            .updateExpression("+");
                       },
                     ),
                   ],
@@ -292,9 +348,15 @@ class MainPage extends StatelessWidget {
                     ),
                     Button(
                       text: "⌫",
+                      // isOperator: true,
                       onClicked: () {
-                        Provider.of<Expression>(context, listen: false)
-                            .updateExpression(" × ");
+                        if (Provider.of<Expression>(context, listen: false)
+                                .expressionController
+                                .text !=
+                            "") {
+                          Provider.of<Expression>(context, listen: false)
+                              .removeChar();
+                        }
                       },
                     ),
                     SizedBox(
@@ -306,9 +368,22 @@ class MainPage extends StatelessWidget {
                       isOperator: true,
                       onClicked: () {
                         // evaluate
-                        Provider.of<History>(context, listen: false).setHistory(
+                        final answer = evaluate(
                             Provider.of<Expression>(context, listen: false)
+                                .expressionController
                                 .text);
+                        if (answer !=
+                            Provider.of<Expression>(context, listen: false)
+                                .expressionController
+                                .text) {
+                          Provider.of<History>(context, listen: false)
+                              .setHistory(Provider.of<Expression>(context,
+                                      listen: false)
+                                  .expressionController
+                                  .text);
+                          Provider.of<Expression>(context, listen: false)
+                              .setExpression(answer);
+                        }
                       },
                     ),
                   ],
