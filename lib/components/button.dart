@@ -6,12 +6,14 @@ class Button extends StatelessWidget {
   final Color? textColour;
   final bool isOperator;
   final VoidCallback onClicked;
+  final bool isLandscape;
   const Button({
     Key? key,
     required this.text,
     required this.onClicked,
     this.textColour = kDarkButtonColour,
     this.isOperator = false,
+    this.isLandscape = false,
   }) : super(key: key);
 
   @override
@@ -20,14 +22,14 @@ class Button extends StatelessWidget {
     return GestureDetector(
       onTap: onClicked,
       child: Container(
-        padding: const EdgeInsets.only(
-          top: 15.0,
-          bottom: 20.0,
-          right: 20.0,
-          left: 20.0,
+        padding: EdgeInsets.only(
+          top: isLandscape ? 5.0 : 20.0,
+          bottom: isLandscape ? 10.0 : 25.0,
+          right: isLandscape ? 30.0 : 20.0,
+          left: isLandscape ? 30.0 : 20.0,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.0),
+          border: Border.all(color: kDarkKeyboardBackgroundColour, width: 0.75),
           color: kDarkButtonBackgroundColour,
         ),
         child: SizedBox(

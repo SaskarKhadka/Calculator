@@ -11,7 +11,23 @@ class Expression extends ChangeNotifier {
 
   updateExpression(String newChar) {
     // adds the new character to the expression at the cursor position
-    expressionController.text += newChar;
+    var cursorPos = expressionController.selection.base.offset;
+    if (cursorPos == -1) {
+      expressionController.text += newChar;
+    } else if (cursorPos == 0) {
+      expressionController.text = newChar + expressionController.text;
+      expressionController.selection =
+          TextSelection.fromPosition(TextPosition(offset: cursorPos + 1));
+    } else {
+      String newHalfText = expressionController.text.substring(0, cursorPos);
+      expressionController.text = newHalfText +
+          newChar +
+          expressionController.text
+              .substring(cursorPos, expressionController.text.length);
+      // expressionController.text = newChar + expressionController.text;
+      expressionController.selection =
+          TextSelection.fromPosition(TextPosition(offset: cursorPos + 1));
+    }
     notifyListeners();
   }
 
@@ -23,7 +39,7 @@ class Expression extends ChangeNotifier {
 
   removeChar() {
     // removes a charcter based on the cursor position
-    var cursorPos = expressionController.selection.baseOffset;
+    var cursorPos = expressionController.selection.base.offset;
     if (cursorPos == -1) {
       expressionController.text = expressionController.text
           .substring(0, expressionController.text.length - 1);
