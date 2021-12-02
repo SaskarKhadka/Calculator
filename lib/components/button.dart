@@ -18,13 +18,13 @@ class Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Size size = MediaQuery.of(context).size;
+    Size size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: onClicked,
       child: Container(
         padding: EdgeInsets.only(
-          top: isLandscape ? 5.0 : 20.0,
-          bottom: isLandscape ? 10.0 : 25.0,
+          top: isLandscape ? size.height * 0.01 : 20.0,
+          bottom: isLandscape ? size.height * 0.015 : 25.0,
           right: isLandscape ? 30.0 : 20.0,
           left: isLandscape ? 30.0 : 20.0,
         ),

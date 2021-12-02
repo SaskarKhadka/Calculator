@@ -205,9 +205,6 @@ class FunctionsKeyboard extends StatelessWidget {
               ),
             ],
           ),
-          // SizedBox(
-          //   height: size.height * 0.03,
-          // ),
           Row(
             children: [
               Expanded(
@@ -245,9 +242,6 @@ class FunctionsKeyboard extends StatelessWidget {
                   isLandscape: true,
                 ),
               ),
-              // SizedBox(
-              //   width: size.width * 0.05,
-              // ),
             ],
           ),
         ],

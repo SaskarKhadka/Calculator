@@ -93,7 +93,7 @@ class Keypad extends StatelessWidget {
               // ),
               Expanded(
                 child: Button(
-                  text: "()",
+                  text: "( )",
                   textColour: kTextColour,
                   onClicked: () {
                     updateExpression(context, "()");
